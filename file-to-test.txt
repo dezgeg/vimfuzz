@@ -1,0 +1,573 @@
+Bacon ipsum dolor amet excepteur pancetta ut aute pork chop. Quis consectetur meatloaf bacon landjaeger, minim ut eu ad esse pancetta kielbasa excepteur. Shank sint aliqua cillum strip steak shankle kevin swine flank,
+shoulder elit. Meatloaf beef ribs laboris, tenderloin in t-bone prosciutto. Leberkas velit adipisicing, tri-tip rump filet mignon officia ut in bacon chicken ham hock aliqua turducken cupidatat.
+
+Ex fatback shank, andouille laborum eiusmod nulla landjaeger dolor chuck. Boudin mollit incididunt enim et. Cillum prosciutto leberkas cupidatat do dolore. Pork belly in jowl, tri-tip hamburger culpa meatball pork chop
+consectetur bacon. Pancetta pig aliquip cupidatat, pariatur landjaeger brisket sint nulla salami anim nostrud porchetta. Sed jerky elit, filet mignon turducken biltong velit adipisicing est pariatur ad.
+
+Venison jerky commodo sirloin. Boudin leberkas kielbasa swine filet mignon minim venison ham, commodo short loin deserunt. Picanha jerky bresaola tail, culpa ham incididunt tongue adipisicing in. Cillum ham sint pork
+chop labore jowl, quis hamburger et incididunt ea landjaeger alcatra. Chicken tail rump lorem est irure. Biltong eu cow shankle boudin. Ground round irure duis, kielbasa sunt ut bresaola elit boudin andouille ball tip.
+
+Bacon ipsum dolor amet shankle proident ham culpa short ribs occaecat magna sirloin do ball tip officia fugiat tempor lorem brisket. Fatback deserunt
+ham hock quis beef mollit, veniam ad leberkas labore short loin capicola ribeye. Voluptate corned beef pork loin, ham sunt pork belly ut. Ad quis
+reprehenderit, pork belly fatback tri-tip ipsum ut sirloin. Id commodo ipsum, enim beef venison nisi short ribs boudin ham biltong qui. Chicken enim
+qui pancetta pig ea proident fatback est rump spare ribs porchetta. Meatloaf proident fatback, minim esse ipsum short loin elit pork eiusmod.
+
+Short ribs nostrud ut sunt, ut pig jowl quis jerky laborum pariatur. Aliqua minim laboris cow t-bone doner. Ut beef ribs dolore biltong. Proident rump
+consequat minim pariatur.  Rump turkey anim voluptate, porchetta occaecat reprehenderit meatloaf ribeye biltong et jerky fugiat. Ground round turkey
+tri-tip jerky magna nostrud, kevin elit. Beef cupim biltong cupidatat short loin, lorem meatloaf turducken jowl tongue minim porchetta aliquip. Pork
+chop magna sausage in dolor biltong alcatra pork belly. Prosciutto labore filet mignon, voluptate meatloaf irure bresaola turkey sausage in sed
+leberkas tongue deserunt jerky.  Tempor excepteur aliqua, sint dolore elit tri-tip cillum.
+
+Strip steak consequat non lorem voluptate porchetta nisi. Shoulder sirloin sausage jerky duis alcatra tenderloin. Nostrud lorem cillum, shank
+turducken est nisi salami beef ribs ground round ball tip boudin non. Labore swine dolore, kielbasa strip steak culpa est. Voluptate labore magna
+hamburger jowl cillum. Reprehenderit cupim tempor enim irure duis dolor.
+
+Turkey sirloin sausage in pork loin ut. Fugiat leberkas sirloin landjaeger strip steak dolor short loin consequat deserunt sint pork chop. Velit
+bresaola ham, filet mignon proident fugiat sausage flank pariatur. Pork landjaeger meatloaf pariatur, consectetur enim proident.
+
+Bacon ipsum dolor amet venison nisi tail fatback pariatur turkey
+capicola short ribs dolore in in voluptate. Short loin kevin chicken
+incididunt, tri-tip short ribs bresaola in sint pork belly ham
+shoulder brisket hamburger. Mollit cillum turkey eu laborum, tempor
+commodo picanha bresaola sausage duis beef ribs chuck alcatra.
+Pastrami non ea ball tip t-bone. Reprehenderit short loin aliquip,
+tail kielbasa pork chop magna nulla pork. Sirloin dolor ut ea occaecat
+dolore tenderloin irure do jowl. Drumstick t-bone picanha, dolor minim
+nulla laboris tri-tip ham hock reprehenderit.
+
+/*-
+ * Copyright (c) 1982, 1986, 1989, 1991, 1993
+ *      The Regents of the University of California.  All rights reserved.
+ * (c) UNIX System Laboratories, Inc.
+ * All or some portions of this file are derived from material licensed
+ * to the University of California by American Telephone and Telegraph
+ * Co. or Unix System Laboratories, Inc. and are reproduced herein with
+ * the permission of UNIX System Laboratories, Inc.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 4. Neither the name of the University nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ *
+ *      @(#)kern_sig.c  8.7 (Berkeley) 4/18/94
+ */
+
+#include <sys/cdefs.h>
+__FBSDID("$FreeBSD: releng/9.1/sys/kern/kern_sig.c 234455 2012-04-19 10:36:23Z kib $");
+
+#include "opt_compat.h"
+#include "opt_kdtrace.h"
+#include "opt_ktrace.h"
+#include "opt_core.h"
+#include "opt_procdesc.h"
+
+#include <sys/param.h>
+#include <sys/systm.h>
+#include <vm/uma.h>
+
+#include <sys/jail.h>
+
+#include <machine/cpu.h>
+
+#include <security/audit/audit.h>
+
+#define ONSIG   32              /* NSIG for osig* syscalls.  XXX. */
+
+SDT_PROVIDER_DECLARE(proc);
+SDT_PROBE_DEFINE(proc, kernel, , signal_send, signal-send);
+
+static int      coredump(struct thread *);
+static char     *expand_name(const char *, uid_t, pid_t, struct thread *, int);
+static int      killpg1(struct thread *td, int sig, int pgid, int all,
+                    ksiginfo_t *ksi);
+static int      issignal(struct thread *td, int stop_allowed);
+static int      sigprop(int sig);
+static void     tdsigwakeup(struct thread *, int, sig_t, int);
+static void     sig_suspend_threads(struct thread *, struct proc *, int);
+static int      filt_sigattach(struct knote *kn);
+static void     filt_sigdetach(struct knote *kn);
+static int      filt_signal(struct knote *kn, long hint);
+static struct thread *sigtd(struct proc *p, int sig, int prop);
+static void     sigqueue_start(void);
+
+static uma_zone_t       ksiginfo_zone = NULL;
+struct filterops sig_filtops = {
+        .f_isfd = 0,
+        .f_attach = filt_sigattach,
+        .f_detach = filt_sigdetach,
+        .f_event = filt_signal,
+};
+
+static int      kern_logsigexit = 1;
+SYSCTL_INT(_kern, KERN_LOGSIGEXIT, logsigexit, CTLFLAG_RW, 
+
+int
+sys_sigqueue(struct thread *td, struct sigqueue_args *uap)
+{
+        ksiginfo_t ksi;
+        struct proc *p;
+        int error;
+
+        if ((u_int)uap->signum > _SIG_MAXSIG)
+                return (EINVAL);
+
+        /*
+         * Specification says sigqueue can only send signal to
+         * single process.
+         */
+        if (uap->pid <= 0)
+                return (EINVAL);
+
+        if ((p = pfind(uap->pid)) == NULL) {
+                if ((p = zpfind(uap->pid)) == NULL)
+                        return (ESRCH);
+        }
+        error = p_cansignal(td, p, uap->signum);
+        if (error == 0 && uap->signum != 0) {
+                ksiginfo_init(&ksi);
+                ksi.ksi_flags = KSI_SIGQ;
+                ksi.ksi_signo = uap->signum;
+                ksi.ksi_code = SI_QUEUE;
+                ksi.ksi_pid = td->td_proc->p_pid;
+                ksi.ksi_uid = td->td_ucred->cr_ruid;
+                ksi.ksi_value.sival_ptr = uap->value;
+                error = pksignal(p, ksi.ksi_signo, &ksi);
+        }
+        PROC_UNLOCK(p);
+        return (error);
+}
+
+/*
+ * Send a signal to a process group.
+ */
+void
+gsignal(int pgid, int sig, ksiginfo_t *ksi)
+{
+        struct pgrp *pgrp;
+
+        if (pgid != 0) {
+                sx_slock(&proctree_lock);
+                pgrp = pgfind(pgid);
+                sx_sunlock(&proctree_lock);
+                if (pgrp != NULL) {
+                        pgsignal(pgrp, sig, 0, ksi);
+                        PGRP_UNLOCK(pgrp);
+                }
+        }
+}
+
+/*
+ * Send a signal to a process group.  If checktty is 1,
+ * limit to members which have a controlling terminal.
+ */
+void
+pgsignal(struct pgrp *pgrp, int sig, int checkctty, ksiginfo_t *ksi)
+{
+        struct proc *p;
+
+        if (pgrp) {
+                PGRP_LOCK_ASSERT(pgrp, MA_OWNED);
+                LIST_FOREACH(p, &pgrp->pg_members, p_pglist) {
+                        PROC_LOCK(p);
+                        if (p->p_state == PRS_NORMAL &&
+                            (checkctty == 0 || p->p_flag & P_CONTROLT))
+                                pksignal(p, sig, ksi);
+                        PROC_UNLOCK(p);
+                }
+        }
+}
+
+
+/*
+ * Force the current process to exit with the specified signal, dumping core
+ * if appropriate.  We bypass the normal tests for masked and caught signals,
+ * allowing unrecoverable failures to terminate the process without changing
+ * signal state.  Mark the accounting record with the signal termination.
+ * If dumping core, save the signal number for the debugger.  Calls exit and
+ * does not return.
+ */
+void
+sigexit(td, sig)
+        struct thread *td;
+        int sig;
+{
+        struct proc *p = td->td_proc;
+
+        PROC_LOCK_ASSERT(p, MA_OWNED);
+        p->p_acflag |= AXSIG;
+        /*
+         * We must be single-threading to generate a core dump.  This
+         * ensures that the registers in the core file are up-to-date.
+         * Also, the ELF dump handler assumes that the thread list doesn't
+         * change out from under it.
+         *
+         * XXX If another thread attempts to single-thread before us
+         *     (e.g. via fork()), we won't get a dump at all.
+         */
+        if ((sigprop(sig) & SA_CORE) && (thread_single(SINGLE_NO_EXIT) == 0)) {
+                p->p_sig = sig;
+                /*
+                 * Log signals which would cause core dumps
+                 * (Log as LOG_INFO to appease those who don't want
+                 * these messages.)
+                 * XXX : Todo, as well as euid, write out ruid too
+                 * Note that coredump() drops proc lock.
+                 */
+                if (coredump(td) == 0)
+                        sig |= WCOREFLAG;
+                if (kern_logsigexit)
+                        log(LOG_INFO,
+                            "pid %d (%s), uid %d: exited on signal %d%s\n",
+                            p->p_pid, p->p_comm,
+                            td->td_ucred ? td->td_ucred->cr_uid : -1,
+                            sig &~ WCOREFLAG,
+                            sig & WCOREFLAG ? " (core dumped)" : "");
+        } else
+                PROC_UNLOCK(p);
+        exit1(td, W_EXITCODE(0, sig));
+        /* NOTREACHED */
+}
+
+The Project Gutenberg EBook of Tehtaan tytöt, by Maria Furuhjelm
+
+This eBook is for the use of anyone anywhere at no cost and with
+almost no restrictions whatsoever.  You may copy it, give it away or
+re-use it under the terms of the Project Gutenberg License included
+with this eBook or online at www.gutenberg.net
+
+
+Title: Tehtaan tytöt
+
+Author: Maria Furuhjelm
+
+Release Date: June 14, 2005 [EBook #16068]
+
+Language: Finnish
+
+
+*** START OF THIS PROJECT GUTENBERG EBOOK TEHTAAN TYTÖT ***
+
+
+
+
+Produced by Matti Järvinen and Tuija Lindholm.
+
+
+
+
+
+Tehtaan tytöt
+
+
+Kirjoittanut
+Maria
+
+
+Ensimmäisen kerran julkaissut
+Kansanvalistusseura 1912.
+
+
+
+
+Tehtaantytöt.
+
+Kirjoittanut Maria.
+
+
+
+
+Eräänä syysiltana, kun Tervolan torpan emäntä ja hänen vanhin tyttärensä
+Miina istuivat rukkiensa ääressä, sanoi Miina yhtäkkiä:
+
+"Äiti, talveksi minä menen tehtaaseen työhön."
+
+"Mitä joutavia", sanoi äiti seisauttaen rukkinsa.
+
+"Niin, täällä kotona olen raatanut pienestä pahasesta, seitsemän,
+kahdeksan vanhasta asti, ensin hoitanut lapsia, sitten elukoita, tehnyt
+raskasta maatyötä ja nyt tahdon päästä paremmille ja helpommille
+päiville."
+
+"Luuletko sinä, että tehdastyö sitten on helpompaa?" virkahti Liisa
+sisko, joka karstasi villoja uunin ääressä. "Minä puuhaan puutarhassa,
+lypsän lehmiä tahi teen mitä tahansa mieluummin kuin menen tehtaaseen."
+
+"Aina sinä siitä puutarhastasi puhut", sanoi Miina ylenkatseellisesti.
+
+"Mutta kuinka olet tullut ajatelleeksi tehtaaseen menoa?" kysyi äiti.
+
+Miina puuhaili rukkinsa ääressä ja sanoi: "Nivalan Leena oli kotona
+juhannuksena, hän tekee työtä villatehtaassa ja sinne minäkin tahdon."
+
+Nyt tuli torpanisäntä tupaan ja kävi uunin eteen lämmittelemään.
+
+"Kuules, Antti", sanoi äiti, "meidän Miina tahtoo mennä tehtaaseen."
+
+Antti ei koskaan jutellut turhia ja siksipä hän nytkin vain katseli
+tytärtään,
+
+"Niin", sanoi Miina, "tehtaassa on kymmentuntinen työpäivä ja
+päiväpalkka voi nousta kahteen markkaan viiteenkymmeneen penniin saakka.
+Pyhäpäivät saa olla vapaana. Täällä kotona täytyy pyhinäkin keittää
+ruokaa, lypsää lehmät ja ruokkia elukat. Ja Leenalla oli niin hienot
+nappikengät ja ne tehtaantytöt syövät vain kahvia ja vehnäleipää."
+
+"Se on kovin järjetöntä", sanoi äiti.
+
+"Ja minä olen kuullut, että niiden täytyy *seistä* kaiket päivät", sanoi
+Liisa.
+
+
+<...>
+
+End of the Project Gutenberg EBook of Tehtaan tytöt, by Maria Furuhjelm
+
+*** END OF THIS PROJECT GUTENBERG EBOOK TEHTAAN TYTÖT ***
+
+***** This file should be named 16068-8.txt or 16068-8.zip *****
+This and all associated files of various formats will be found in:
+        http://www.gutenberg.org/1/6/0/6/16068/
+
+Produced by Matti Järvinen and Tuija Lindholm.
+
+Updated editions will replace the previous one--the old editions
+will be renamed.
+
+Creating the works from public domain print editions means that no
+one owns a United States copyright in these works, so the Foundation
+(and you!) can copy and distribute it in the United States without
+permission and without paying copyright royalties.  Special rules,
+set forth in the General Terms of Use part of this license, apply to
+copying and distributing Project Gutenberg-tm electronic works to
+protect the PROJECT GUTENBERG-tm concept and trademark.  Project
+Gutenberg is a registered trademark, and may not be used if you
+charge for the eBooks, unless you receive specific permission.  If you
+do not charge anything for copies of this eBook, complying with the
+rules is very easy.  You may use this eBook for nearly any purpose
+such as creation of derivative works, reports, performances and
+research.  They may be modified and printed and given away--you may do
+practically ANYTHING with public domain eBooks.  Redistribution is
+subject to the trademark license, especially commercial
+redistribution.
+
+
+
+*** START: FULL LICENSE ***
+
+THE FULL PROJECT GUTENBERG LICENSE
+PLEASE READ THIS BEFORE YOU DISTRIBUTE OR USE THIS WORK
+
+To protect the Project Gutenberg-tm mission of promoting the free
+distribution of electronic works, by using or distributing this work
+(or any other work associated in any way with the phrase "Project
+Gutenberg"), you agree to comply with all the terms of the Full Project
+Gutenberg-tm License (available with this file or online at
+http://gutenberg.net/license).
+
+
+Section 1.  General Terms of Use and Redistributing Project Gutenberg-tm
+electronic works
+
+1.A.  By reading or using any part of this Project Gutenberg-tm
+electronic work, you indicate that you have read, understand, agree to
+and accept all the terms of this license and intellectual property
+(trademark/copyright) agreement.  If you do not agree to abide by all
+the terms of this agreement, you must cease using and return or destroy
+all copies of Project Gutenberg-tm electronic works in your possession.
+If you paid a fee for obtaining a copy of or access to a Project
+Gutenberg-tm electronic work and you do not agree to be bound by the
+terms of this agreement, you may obtain a refund from the person or
+entity to whom you paid the fee as set forth in paragraph 1.E.8.
+
+1.B.  "Project Gutenberg" is a registered trademark.  It may only be
+used on or associated in any way with an electronic work by people who
+agree to be bound by the terms of this agreement.  There are a few
+things that you can do with most Project Gutenberg-tm electronic works
+even without complying with the full terms of this agreement.  See
+paragraph 1.C below.  There are a lot of things you can do with Project
+Gutenberg-tm electronic works if you follow the terms of this agreement
+and help preserve free future access to Project Gutenberg-tm electronic
+works.  See paragraph 1.E below.
+
+<...>
+
+This Web site includes information about Project Gutenberg-tm,
+including how to make donations to the Project Gutenberg Literary
+Archive Foundation, how to help produce our new eBooks, and how to
+subscribe to our email newsletter to hear about new eBooks.
+
+$,=42;for(34,0,-3,9,-11,11,-17,7,-5){$*.=pack'c'=>$,+=$_}for(reverse split//=>$*
+){$%++?$ %%2?push@C,$_,$":push@c,$_,$":(push@C,$_,$")&&push@c,$"}$C[$#C]=$/;($#C
+>$#c)?($ c=\@C)&&($ C=\@c):($ c=\@c)&&($C=\@C);$%=$|;for(@$c){print$_^$$C[$%++]}
+-n map$_=++$_.$/,@p[9-$_..8]}{print@p
+-nl ++$$[--$_]}{map{print$t+=pop@$}@$
+ce@x,rand@x,1 while@x
+int splice @x,rand@x,1while@x
+ce@a,rand@a,1while@a
+int splice@a,rand@a,1while@a
+-l print map{push@v,($_)x($v[0]||$_);shift@v}map$ARGV[$_%2^1],(1..pop)
+-l @.=@ARGV;$.=1,s/./$.[$.^=1]x$&/ge,$_.=$.[!$.]until/.{$.[2]}/;print$&
+for$"(1..pop){/.$/;$_=($-=$ARGV[$"-1&1])x($&||$-).$_;print chop}print$/
+-l $_.=($x=$ARGV[$i%2])x(/./g,$x)[$i++]while$i<500;print substr$_,0,pop
+$$=pop;$.=$ARGV[$|--],$_.=$.x substr$_.$.,$*++,1while!/.{$$}/;print$&,$/
+-l /.{$i}(.)/,$;=$ARGV[$i++%2],$_.=$;x($1||$;)until/.{$ARGV[2]}/;print$&
+($a,$b,$c)=@ARGV;for(0..$c){$s.=($_%2?$b:$a)x(substr($s,$_,1)||shift)}print
+substr($s,0,$c)."
+($,,$;,$")=@ARGV;$_=$,x$,;$_.=(/$,$/?$;:$,)x(substr($_,++$i,1)||$;)while$i<$
+";/.{$"}/;print$&
+-l ($:,$;,$%)=@ARGV;$_=$:x$:;$_.=$;
+x(substr$_,++$x,1or$;),($:,$;)=($;,$:)while$%>$x;/.{$%}/;print$&
+@a=@ARGV;@b="";for$i(1..$a[2]){for$j(1..($b[$i]||$a[$t])){push(@b,$a[$t])}$t
+=!$t;$_.=$b[$i]}print
+-l ($a,$b,$l)=@ARGV;$b+=$a;for(1..$l){$p=$a-
+1;$s.=@n?($p=pop@n):$a;@n=(($a)x$p,@n);$a=$b-$a;}print$s;
+($n,$s,$i)=@ARGV;$l=0;map{push@r,(@ARGV[$l])x$n;$l=$l?0:1;$n=@r[$_]?@r[$_]:$
+s;}1..500;print@r[0..--$i]
+-l ($.,$/,$")=@ARGV;split'',$.x$..$/;for(0..$"){$_[$%++]=$-
+?$/:$.for(1..$_[$?++]);$-=1-$-}$#_=$"-1;print@_
+@k=@ARGV;for(0..pop){splice(@k,$o,$k[$i],($x=shift)x$k[$i]),$o+=$k[$i++],pus
+h@ARGV,$x}print @k[0..$i-2]
+($a,$b,$c)=@ARGV;for$d(0..$c){push@e,$a;$f=$e[$d];for(2..$f){push@e,$a}($a,$
+b)=($b,$a)}print@e[0..$c-1]
+-l ($a)=@a=@ARGV;@s=($a,$a[$a-
+1?0:1]);map{$e.=$d=$s[$x];map{$s[$j++]=$a[$x%2]}1..$d;$x++}1..$a[-1];print$e
+-l ($a,$b,$c)=@ARGV;$o=$a x$a.$b x($a>1?$a:$b);$o.=$ARGV[$_%2]x substr$o,$_,1
+for 2..$c;print substr$o,0,$c
+-l ($%,$/)=@ARGV;$@=$%x$%.$/x($%==1?$/:$%);map{$@.=($_%2?$/:$%)x substr
+$@,$_,1}2..500;print substr $@,0,pop
+@a=@ARGV;while($a[2]--){if($_){s/.//;print$&;$_.=$a[$|--
+]x$&}else{$_=$a[$|]x$a[$|--];s/.//;print$&}}print"
+-l ($b,$a,$d)=@ARGV;do{push@l,split//,$b x($l[$c++]?$l[$c-
+1]:$b);($a,$b)=($b,$a)}while@l<$d;print@l[0..$d-1]
+@t=shift;$b=shift;for(1..pop){for(1..$t[$n]){@t[$i++]=$n%2?$b:$t[0]}$t[1]=$t[1]
+||$b;$f.=$t[$n++]}print"$f\n"
+@t=@ARGV;$l=pop@t;$"='';for($s="@t";$n<999;$i=0){$s=~s/(.)/$t[++$n,$i++%2]x$1/g
+-l eval'$l=@a=/./g;map$l-=$_*!!$l,@a;s/$/$ARGV[!!$l^$a[-1]==$ARGV[0]]/;'x
+-l $,=pop;$a=\substr$_="@ARGV "x$,,0,$,;s/(.) /$+x
+substr$_,$i++,1/ewhile$i<$,;print$$a
+-l $c=pop;$a=\substr$_="@ARGV "x$c,0,$c;eval's/(.) /$+x
+substr$_,$i++,1/e;'x500;print$$a
+-l $_=\substr$@=1x pop,0;$@="";substr($@.=$ARGV[$|--],-
+1)x=substr$@,$_,1for$"..500;print$$_
+-l eval'if($l=@a=/./g){$i++until($l-=$a[$i])<1}
+$i=!s/$/$ARGV[($a[-1]==$ARGV[0])^!!$l]/;'x
+-l print map$_=$ARGV[($.+=!--$.[$.])%2],@.=(0)x pop
+-l print map$.[$!++]=$ARGV[1&($.+=!--$.[$.])],1..pop
+-l print map$$[$.++]=$ARGV[--$$[$;]||++$;,$;&1],1..pop
+s/.?/$ARGV[1&pos]x$&||2/ge>>9?print$_&'?'x pop,$/:do$0
+print$_?$.[$!++]=$ARGV[--$.[$.]||++$.,$.%2]:$/for-pop..0
+-l for$$(1..pop){$_.=$ARGV[1&grep$|<($$-=$_),/./g]}print
+-l print eval'($_.=chop()x$+.$ARGV[$|--])=~/$&(.)/,'x pop
+s/.?/$ARGV[1&pos]x($&||1)/geuntil/.{$ARGV[2]}/;print$&,$/
+$;=pop;s/.?/$ARGV[1&pos]x($&||1)/eguntil/.{$;}/;print"$&
+-l s/.?/$ARGV[1&pos]x($&||1)/eg until/.{$ARGV[2]}/;print$&
+-l $_.=2while$|=s/./$ARGV[--$|]x$&/ge<999;print$_&'?'x pop
+-l print+map{$c--||($v=$ARGV[$|--],$c=$_<1?$v:$_-1?$s[$_-$d]:$v,$d+=--
+$c);$s[$_]=$v}0..-1+pop
+($a,$b,$l)=@ARGV;push@a,($_%2?$b:$a)x($_<2?$a<2*$_?$b:$a:$a[$_])for
+0..$l;print@a[0..$l-1],$/
+($a,$b,$c)=@ARGV;for$i(0..$c){pos=$i;/./g;$_.=($i%2?$b:$a)x($_==1?$b:$&||$a)}pr
+int/(.{$c})/,$/
+($a,$b,$c)=@ARGV;while(@_<$c){map{push+_,$a}1..$_[$l++]||$a;$a^=$b^=$a^=$b}p
+rint@_[0..$c-1]
+b:if(@b==$ARGV[2]){print@b,"
+";exit}push @b,$ARGV[$i%2];$k++;$k<$b[$i]&&goto b;$k=0;$i++;goto b
+($a,$b,$c)=@ARGV;for(0..$c){$s.=($_%2?$b:$a)x(substr($s,$_,1)||shift)}print
+substr($s,0,$c)."
+($,,$;,$")=@ARGV;$_=$,x$,;$_.=(/$,$/?$;:$,)x(substr($_,++$i,1)||$;)while$i<$
+";/.{$"}/;print$&
+-l ($:,$;,$%)=@ARGV;$_=$:x$:;$_.=$;
+x(substr$_,++$x,1or$;),($:,$;)=($;,$:)while$%>$x;/.{$%}/;print$&
+@a=@ARGV;@b="";for$i(1..$a[2]){for$j(1..($b[$i]||$a[$t])){push(@b,$a[$t])}$t
+=!$t;$_.=$b[$i]}print
+-l ($a,$b,$l)=@ARGV;$b+=$a;for(1..$l){$p=$a-
+1;$s.=@n?($p=pop@n):$a;@n=(($a)x$p,@n);$a=$b-$a;}print$s;
+($n,$s,$i)=@ARGV;$l=0;map{push@r,(@ARGV[$l])x$n;$l=$l?0:1;$n=@r[$_]?@r[$_]:$
+s;}1..500;print@r[0..--$i]
+-l ($.,$/,$")=@ARGV;split'',$.x$..$/;for(0..$"){$_[$%++]=$-
+?$/:$.for(1..$_[$?++]);$-=1-$-}$#_=$"-1;print@_
+@k=@ARGV;for(0..pop){splice(@k,$o,$k[$i],($x=shift)x$k[$i]),$o+=$k[$i++],pus
+h@ARGV,$x}print @k[0..$i-2]
+($a,$b,$c)=@ARGV;for$d(0..$c){push@e,$a;$f=$e[$d];for(2..$f){push@e,$a}($a,$
+b)=($b,$a)}print@e[0..$c-1]
+-l ($a)=@a=@ARGV;@s=($a,$a[$a-
+1?0:1]);map{$e.=$d=$s[$x];map{$s[$j++]=$a[$x%2]}1..$d;$x++}1..$a[-1];print$e
+-l ($a,$b,$c)=@ARGV;$o=$a x$a.$b x($a>1?$a:$b);$o.=$ARGV[$_%2]x substr$o,$_,1
+for 2..$c;print substr$o,0,$c
+-l ($%,$/)=@ARGV;$@=$%x$%.$/x($%==1?$/:$%);map{$@.=($_%2?$/:$%)x substr
+$@,$_,1}2..500;print substr $@,0,pop
+@a=@ARGV;while($a[2]--){if($_){s/.//;print$&;$_.=$a[$|--
+]x$&}else{$_=$a[$|]x$a[$|--];s/.//;print$&}}print"
+-l ($b,$a,$d)=@ARGV;do{push@l,split//,$b x($l[$c++]?$l[$c-
+1]:$b);($a,$b)=($b,$a)}while@l<$d;print@l[0..$d-1]
+@t=shift;$b=shift;for(1..pop){for(1..$t[$n]){@t[$i++]=$n%2?$b:$t[0]}$t[1]=$t[1]
+||$b;$f.=$t[$n++]}print"$f\n"
+@t=@ARGV;$l=pop@t;$"='';for($s="@t";$n<999;$i=0){$s=~s/(.)/$t[++$n,$i++%2]x$1/g
+e;}print substr($s,0,$l),"\n";
+($.,$/,$,)=@ARGV;$_=($;=$.)x$.;while((length)<$,){$;=$:++%2?$.:$/;/.{$:}(.)/
+;$_.=$;x($+||$;)}print/(.{$,})/
+for(@*=@ARGV;@/<$*[2];){@/<2?push@/,($*[$/])x$*[$/++]:push@/,($*[$*%2])x$/[$/++
+];$*++;}print@/[0..$*[2]-1],"
+-l (@n[0,1],$c)=@ARGV;while($c>0){$c-
+a)x$a[$j]);@a=(@a,($b)x$a[$j+1])}print@a[0..$l-1]
+-l while($l=$ARGV[2]-
+length($s)){$d=$ARGV[($e++)%2];push@l,split//,"$d"x($l[0]||$d)
+($a,$b,$c)=@ARGV;while(@_<$c){map{push+_,$a}1..$_[$l++]||$a;$a^=$b^=$a^=$b}p
+rint@_[0..$c-1]
+b:if(@b==$ARGV[2]){print@b,"
+";exit}push @b,$ARGV[$i%2];$k++;$k<$b[$i]&&goto b;$k=0;$i++;goto b
+($a,$b,$c)=@ARGV;for(0..$c){$s.=($_%2?$b:$a)x(substr($s,$_,1)||shift)}print
+substr($s,0,$c)."
+($,,$;,$")=@ARGV;$_=$,x$,;$_.=(/$,$/?$;:$,)x(substr($_,++$i,1)||$;)while$i<$
+";/.{$"}/;print$&
+-l ($:,$;,$%)=@ARGV;$_=$:x$:;$_.=$;
+f{my($c,$a,$b,@i)=@_;if(@i){($x,$y,$z)=f($#i,@i);(($x.$y)=~/^($a$b|$b$a)$/)?
+($x,$y,$y.$x eq reverse $1):$z&&(($y.$x)=~/^($a$b|$b$a)$/)?($y,$x):$c?f($c-
+1,$a,@i,$b):()}else{$a,$b,1}}
+
+#include<stdio.h>
+#include<stdlib.h>
+#include<ctype.h>
+
+int u,z,q[0400],O[0x101],o[0401],I[257],w[258][0403],W[0x100],Z[0x103],c[0403],k
+,i,j,n,l,p,m;const char*J[0416],*M[0400];FILE*K[280],*s[0x102];void f(char*n,int
+a){char*e=n;while(*e!='\0'){if(tolower((int)*e)!=*e)fputc(040,stderr);fputc((*e)
+-a,stderr);e+=1;}(void)fputc('\n',stderr);}int y(int a,int b);int t(int i,int j)
+{int k=i&j,l=i^j,n,m=1;for(n=1;k>=n;n<<=1)if(k&n)m=y(m,1<<n|1<<(n-1));return m>1
+?y(m,1<<l):1<<l;}int y(int a,int b){int n,i=0x0,j;if((n=w[a][b]))return n;for(;a
+>>i;++i)for(j=0x0;b>>j;j++)if(((a>>i)&1)&&((b>>j)&1))n^=t(i,j);return w[a][b]=w[
+b][a]=n;}void a(void){for(i=0;i<z;i++){n=0;if(!i[I]){for(j=0;j<u;++j)if(i[O]==q[
+j])n=Z[j];}else for(j=0;j<u;j++)n^=w[Z[j]][w[I[i]][W[w[o[j]][O[i]^q[j]]]]];c[i]=
+n;}}void X(int v,int u){char*y=0;v-=1;switch(v){case(0x2):y ="HckngfVqQrgpKprwv"
+"Hkng"; BC(4):y="JempihXsStirMrtyxJmpi"; BC(0):y="PointValueTooLarge"; BC 0x1:y=
+"EvqmjdbufJoqvuQpjou";BC(6):y="TuOtv{zLorky";BC(3):y="WrrPdq|RxwsxwSrlqwv";BC(5)
+:y="GfiFwlzrjsyX~syf}"; BC(07):y="UvV|{w|{Mpslz";}if(u)exit(0); f(y,v);exit(1);}
+int main(int t,const char*T[]){for(i=00;i<0x100;++i)for(j=0;j<=i;++j)if(1==y(i,j
+))W[i]=j,W[j]=i;for(k=0x1;k<t;k++){p=0;for(l=0;(T[k][l]>=toupper('0'))&&(T[k][l]
+<=tolower('9'));l++){p=p*10+(T[k][l]-'0');if(p>=256)X(1,0);}if(T[k][l]=='-'){for
+(m=0;m<u;m++)if(q[m]==p)X(2,0);q[u]=p;J[u]=T[k]+l+1;K[u]=fopen(J[u],"r");if(!u[K
+])X(3,0);u++;}else if(T[k][l]=='+'){if(z>=256)X(4,0); O[z]=p;M[z]=T[k]+l+1;s[z]=
+fopen(M[z],"w");if(!s[z])X(5,0);z++;}else X(6,0);}if(!(u!=0))X(7,0);if(!(z!= 0))
+X(8,0);for(i=0;i<u;i++){n=1;for(j=0;j<u; j+=1)if(j!=i)n=w[n][q[i]^q[j]];o[i]=n;}
+for(i=0;i<z;i++){n=1;for(j=0;j<u;j++)n=w[n][O[i]^q[j]];I[i]=n;}while(!(0)){for(k
+=0;k<u;k++){int n;n=getc(K[k]); if(n==EOF)X(42,1); Z[k]=n;}a();for(k=0;k<z;k++)(
+void)putc(c[k],s[k]);}X(11,1);}

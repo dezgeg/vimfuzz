@@ -1,0 +1,141 @@
+# Motions, in visual but not normal mode
+"aw",				# VimMotionTextOuterWord
+"aW",				# VimMotionTextOuterBigWord
+"iw",				# VimMotionTextInnerWord
+"iW",				# VimMotionTextInnerBigWord
+"ip",				# VimMotionInnerParagraph
+"ap",				# VimMotionOuterParagraph
+"is",				# VimMotionInnerSentence
+"as",				# VimMotionOuterSentence
+"i<",				# VimMotionInnerBlockAngle
+"i>",				# VimMotionInnerBlockAngle
+"iB",				# VimMotionInnerBlockBrace
+"i{",				# VimMotionInnerBlockBrace
+"i}",				# VimMotionInnerBlockBrace
+"i[",				# VimMotionInnerBlockBracket
+"i]",				# VimMotionInnerBlockBracket
+"ib",				# VimMotionInnerBlockParen
+"i(",				# VimMotionInnerBlockParen
+"i)",				# VimMotionInnerBlockParen
+"i\"",     			# VimMotionInnerBlockDoubleQuote
+"i'",				# VimMotionInnerBlockSingleQuote
+"i`",				# VimMotionInnerBlockBackQuote
+"a<",				# VimMotionOuterBlockAngle
+"a>",				# VimMotionOuterBlockAngle
+"aB",				# VimMotionOuterBlockBrace
+"a{",				# VimMotionOuterBlockBrace
+"a}",				# VimMotionOuterBlockBrace
+"a[",				# VimMotionOuterBlockBracket
+"a]",				# VimMotionOuterBlockBracket
+"ab",				# VimMotionOuterBlockParen
+"a(",				# VimMotionOuterBlockParen
+"a)",				# VimMotionOuterBlockParen
+"a\"",     			# VimMotionOuterBlockDoubleQuote
+"a'",				# VimMotionOuterBlockSingleQuote
+"a`",				# VimMotionOuterBlockBackQuote
+
+# Motions, in visual and normal mode
++				# VimMotionDownFirstNonSpace
+_				# VimMotionDownLess1FirstNonSpace
+0				# VimMotionFirstColumn
+g0				# VimMotionFirstScreenColumn
+^				# VimMotionFirstNonSpace
+g^				# VimMotionFirstScreenNonSpace
+gg				# VimMotionGotoLineFirst
+G				# VimMotionGotoLineLast
+$				# VimMotionLastColumn
+g$				# VimMotionLastScreenColumn
+g_				# VimMotionLastNonSpace
+h				# VimMotionLeft
+go				# VimMotionNthCharacter
+l				# VimMotionRight
+k				# VimMotionUp
+gk				# VimMotionUp
+-				# VimMotionUpFirstNonSpace
+ge				# VimMotionWordEndLeft
+e				# VimMotionWordEndRight
+b				# VimMotionWordLeft
+w				# VimMotionWordRight
+gE				# VimMotionBigWordEndLeft
+E				# VimMotionBigWordEndRight
+B				# VimMotionBigWordLeft
+W				# VimMotionBigWordRight
+(				# VimMotionSentenceStartPrevious
+)				# VimMotionSentenceStartNext
+g(				# VimMotionSentenceEndPrevious
+g)				# VimMotionSentenceEndNext
+{				# VimMotionParagraphPrevious
+}				# VimMotionParagraphNext
+[{				# VimMotionUnmatchedBraceOpen
+]}				# VimMotionUnmatchedBraceClose
+[(				# VimMotionUnmatchedParenOpen
+])				# VimMotionUnmatchedParenClose
+[]				# VimMotionSectionBackwardEnd
+[[				# VimMotionSectionBackwardStart
+]]				# VimMotionSectionForwardEnd
+][				# VimMotionSectionForwardStart
+[M				# VimMotionMethodBackwardEnd
+[m				# VimMotionMethodBackwardStart
+]M				# VimMotionMethodForwardEnd
+]m				# VimMotionMethodForwardStart
+
+# One-parameter motions
+f				# VimMotionRightMatchChar
+F				# VimMotionLeftMatchChar
+t				# VimMotionRightTillMatchChar
+T				# VimMotionLeftTillMatchChar
+
+# Yanks
+Y				# VimCopyYankLine
+yy				# VimCopyYankLine
+y				# VimCopyYankMotion
+
+# Pastes
+P				# VimCopyPutTextBeforeCursor
+p				# VimCopyPutTextAfterCursor
+gP				# VimCopyPutTextBeforeCursorMoveCursor
+gp				# VimCopyPutTextAfterCursorMoveCursor
+[P				# VimCopyPutTextBeforeCursorNoIndent
+]P				# VimCopyPutTextBeforeCursorNoIndent
+[p				# VimCopyPutTextAfterCursorNoIndent
+]p				# VimCopyPutTextAfterCursorNoIndent
+
+
+# Has motion, has input
+c				# VimChangeMotion
+
+# No motion, has input
+s				# VimChangeCharacters
+C				# VimChangeEndOfLine
+cc				# VimChangeLine
+S				# VimChangeLine
+R				# VimChangeReplace
+a				# VimInsertAfterCursor
+A				# VimInsertAfterLineEnd
+gi				# VimInsertAtPreviousInsert
+I				# VimInsertBeforeFirstNonBlank
+gI				# VimInsertLineStart
+O				# VimInsertNewLineAbove
+o				# VimInsertNewLineBelow
+
+# No motion, one-char input
+r				# VimChangeCharacter
+
+# No motion, no input
+~				# VimChangeCaseToggleCharacter
+X				# VimDeleteCharacterLeft
+x				# VimDeleteCharacterRight
+D				# VimDeleteEndOfLine
+dd				# VimDeleteLine
+<<				# VimShiftLeftLines
+>>				# VimShiftRightLines
+gJ				# VimDeleteJoinLines
+J				# VimDeleteJoinLinesSpaces
+
+# Has motion, no input
+d				# VimDeleteMotion
+<				# VimShiftLeftMotion
+>				# VimShiftRightMotion
+gu				# VimChangeCaseLowerMotion
+g~				# VimChangeCaseToggleMotion
+gU				# VimChangeCaseUpperMotion
