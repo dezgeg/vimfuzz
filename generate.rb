@@ -56,7 +56,7 @@ nvoMotion = oneOf [
   "G",				# VimMotionGotoLineLast
   "$",				# VimMotionLastColumn
   # "g$",				# VimMotionLastScreenColumn
-  "g_",				# VimMotionLastNonSpace
+  # "g_",				# VimMotionLastNonSpace           # FIXME: broken in ideavim
   "h",				# VimMotionLeft
   "go",				# VimMotionNthCharacter
   "l",				# VimMotionRight
