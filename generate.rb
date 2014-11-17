@@ -135,8 +135,8 @@ voMotion = oneOf [nvoMotion, voOnlyMotion]
 
 commandWithMotion = oneOf [
   "d",				# VimDeleteMotion
-  # "<lt>",				# VimShiftLeftMotion            # these are a bit boring
-  # ">",				# VimShiftRightMotion           # these are a bit boring
+  "<lt>",				# VimShiftLeftMotion          # these are a bit boring
+  ">",				# VimShiftRightMotion           # these are a bit boring
   # "gu",				# VimChangeCaseLowerMotion    # XXX: disable these, since they are *extremely* slow in IdeaVim...
   # "g~",				# VimChangeCaseToggleMotion
   # "gU",				# VimChangeCaseUpperMotion
@@ -169,11 +169,13 @@ commandNullary = oneOf [
   ">>",				# VimShiftRightLines
   "gJ",				# VimDeleteJoinLines
   "J",				# VimDeleteJoinLinesSpaces
+  "<C-A>",		# VimChangeNumberInc
+  "<C-X>",		# VimChangeNumberDec
   # missing pastes: p P gp gP ]p [p ]P [P
   # missing: yy Y
 ]
 
-# missing: r<char> u U C-R & g& = C-A C-X
+# missing: r<char> u U C-R & g& =
 # missing marks: m ` ' g` g'
 # missing: macros
 
