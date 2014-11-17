@@ -37,7 +37,7 @@ voOnlyMotion = oneOf([
   "i\"",     	# VimMotionInnerBlockDoubleQuote
   "i'",				# VimMotionInnerBlockSingleQuote
   "i`",				# VimMotionInnerBlockBackQuote
-  "a<",				# VimMotionOuterBlockAngle
+  "a<lt>",				# VimMotionOuterBlockAngle
   "a>",				# VimMotionOuterBlockAngle
   "aB",				# VimMotionOuterBlockBrace
   "a{",				# VimMotionOuterBlockBrace
@@ -62,14 +62,14 @@ nvoMotion = oneOf([
   "|",				# VimMotionColumn
   "^",				# VimMotionFirstNonSpace
   "$",				# VimMotionLastColumn
-  # "g_",				# VimMotionLastNonSpace           # FIXME: broken in ideavim
+  "g_",				# VimMotionLastNonSpace           # FIXME: broken in ideavim
 
 
   "gg",				# VimMotionGotoLineFirst
   "G",				# VimMotionGotoLineLast
-  # "_",				# VimMotionDownLess1FirstNonSpace # FIXME
-  # "+",				# VimMotionDownFirstNonSpace      # FIXME
-  # "-",				# VimMotionUpFirstNonSpace        # FIXME
+  "_",				# VimMotionDownLess1FirstNonSpace # FIXME
+  "+",				# VimMotionDownFirstNonSpace      # FIXME
+  "-",				# VimMotionUpFirstNonSpace        # FIXME
 
   "ge",				# VimMotionWordEndLeft
   "e",				# VimMotionWordEndRight
@@ -111,6 +111,9 @@ nvoMotion = oneOf([
   "M",				# VimMotionMiddleScreenLine
   "L",				# VimMotionLastScreenLine
 
+  "zl",        # VimMotionScrollColumnLeft
+  "zh",        # VimMotionScrollColumnRight
+
   "zt",        # VimMotionScrollFirstScreenLine
   "zs",        # VimMotionScrollFirstScreenColumn
   "z+",        # VimMotionScrollFirstScreenLinePageStart
@@ -118,16 +121,21 @@ nvoMotion = oneOf([
   "ze",        # VimMotionScrollLastScreenColumn
   "z-",        # VimMotionScrollLastScreenLineStart
   "z^",        # VimMotionScrollLastScreenLinePageStart
-  # "z<CR>",        # VimMotionScrollFirstScreenLineStart
-  # "<C-D>",        # VimMotionScrollHalfPageDown
-  # "<C-U>",        # VimMotionScrollHalfPageUp
+  "z<CR>",        # VimMotionScrollFirstScreenLineStart
+  "<C-D>",        # VimMotionScrollHalfPageDown
+  "<C-U>",        # VimMotionScrollHalfPageUp
+  "<C-E>",        # VimMotionScrollLineDown
+  "<C-Y>",        # VimMotionScrollLineUp
+  "<C-F>",        # VimMotionScrollPageDown
+  "<C-B>",        # VimMotionScrollPageUp
+  "<C-H>",        # VimMotionLeftWrap
 ]))
 
 voMotion = oneOf [nvoMotion, voOnlyMotion]
 
 commandWithMotion = oneOf [
   "d",				# VimDeleteMotion
-  # "<",				# VimShiftLeftMotion            # these are a bit boring
+  # "<lt>",				# VimShiftLeftMotion            # these are a bit boring
   # ">",				# VimShiftRightMotion           # these are a bit boring
   # "gu",				# VimChangeCaseLowerMotion    # XXX: disable these, since they are *extremely* slow in IdeaVim...
   # "g~",				# VimChangeCaseToggleMotion
