@@ -1,4 +1,6 @@
 set nocp
+set autoindent
+set nojoinspaces
 set sw=4 ts=4 sts=4 expandtab
 edit /tmp/vimfuzz/input.txt
 

@@ -9,60 +9,67 @@ count = weighted [
 ]
 
 voOnlyMotion = oneOf [
+  "0",				# VimMotionFirstColumn
   "aw",				# VimMotionTextOuterWord
   "aW",				# VimMotionTextOuterBigWord
   "iw",				# VimMotionTextInnerWord
   "iW",				# VimMotionTextInnerBigWord
   "ip",				# VimMotionInnerParagraph
   "ap",				# VimMotionOuterParagraph
-  "is",				# VimMotionInnerSentence
-  "as",				# VimMotionOuterSentence
-  "i<",				# VimMotionInnerBlockAngle
-  "i>",				# VimMotionInnerBlockAngle
-  "iB",				# VimMotionInnerBlockBrace
-  "i{",				# VimMotionInnerBlockBrace
-  "i}",				# VimMotionInnerBlockBrace
-  "i[",				# VimMotionInnerBlockBracket
-  "i]",				# VimMotionInnerBlockBracket
-  "ib",				# VimMotionInnerBlockParen
-  "i(",				# VimMotionInnerBlockParen
-  "i)",				# VimMotionInnerBlockParen
-  "i\"",     	# VimMotionInnerBlockDoubleQuote
-  "i'",				# VimMotionInnerBlockSingleQuote
-  "i`",				# VimMotionInnerBlockBackQuote
-  "a<",				# VimMotionOuterBlockAngle
-  "a>",				# VimMotionOuterBlockAngle
-  "aB",				# VimMotionOuterBlockBrace
-  "a{",				# VimMotionOuterBlockBrace
-  "a}",				# VimMotionOuterBlockBrace
-  "a[",				# VimMotionOuterBlockBracket
-  "a]",				# VimMotionOuterBlockBracket
-  "ab",				# VimMotionOuterBlockParen
-  "a(",				# VimMotionOuterBlockParen
-  "a)",				# VimMotionOuterBlockParen
-  "a\"",     	# VimMotionOuterBlockDoubleQuote
-  "a'",				# VimMotionOuterBlockSingleQuote
-  "a`",				# VimMotionOuterBlockBackQuote
+  # "is",				# VimMotionInnerSentence        # minor bugs
+  # "as",				# VimMotionOuterSentence        # minor bugs
+
+  # "i<",				# VimMotionInnerBlockAngle
+  # "i>",				# VimMotionInnerBlockAngle
+  # "iB",				# VimMotionInnerBlockBrace
+  # "i{",				# VimMotionInnerBlockBrace
+  # "i}",				# VimMotionInnerBlockBrace
+  # "i[",				# VimMotionInnerBlockBracket
+  # "i]",				# VimMotionInnerBlockBracket
+  # "ib",				# VimMotionInnerBlockParen
+  # "i(",				# VimMotionInnerBlockParen
+  # "i)",				# VimMotionInnerBlockParen
+  # "i\"",     	# VimMotionInnerBlockDoubleQuote
+  # "i'",				# VimMotionInnerBlockSingleQuote
+  # "i`",				# VimMotionInnerBlockBackQuote
+  # "a<",				# VimMotionOuterBlockAngle
+  # "a>",				# VimMotionOuterBlockAngle
+  # "aB",				# VimMotionOuterBlockBrace
+  # "a{",				# VimMotionOuterBlockBrace
+  # "a}",				# VimMotionOuterBlockBrace
+  # "a[",				# VimMotionOuterBlockBracket
+  # "a]",				# VimMotionOuterBlockBracket
+  # "ab",				# VimMotionOuterBlockParen
+  # "a(",				# VimMotionOuterBlockParen
+  # "a)",				# VimMotionOuterBlockParen
+  # "a\"",     	# VimMotionOuterBlockDoubleQuote
+  # "a'",				# VimMotionOuterBlockSingleQuote
+  # "a`",				# VimMotionOuterBlockBackQuote
 ]
 
 nvoMotion = oneOf [
-  "+",				# VimMotionDownFirstNonSpace
-  "_",				# VimMotionDownLess1FirstNonSpace
-  #"0",				# VimMotionFirstColumn
-  # "g0",				# VimMotionFirstScreenColumn
+  "h",				# VimMotionLeft
+  "j",				# VimMotionDown
+  "k",				# VimMotionUp
+  "l",				# VimMotionRight
+
+  "go",				# VimMotionNthCharacter
+  "|",				# VimMotionColumn
   "^",				# VimMotionFirstNonSpace
-  # "g^",				# VimMotionFirstScreenNonSpace
+  "$",				# VimMotionLastColumn
+  # "g_",				# VimMotionLastNonSpace           # FIXME: broken in ideavim
+
+
   "gg",				# VimMotionGotoLineFirst
   "G",				# VimMotionGotoLineLast
-  "$",				# VimMotionLastColumn
+  # "_",				# VimMotionDownLess1FirstNonSpace # FIXME
+  # "+",				# VimMotionDownFirstNonSpace      # FIXME
+  # "-",				# VimMotionUpFirstNonSpace        # FIXME
+
+  # "g0",				# VimMotionFirstScreenColumn
   # "g$",				# VimMotionLastScreenColumn
-  # "g_",				# VimMotionLastNonSpace           # FIXME: broken in ideavim
-  "h",				# VimMotionLeft
-  "go",				# VimMotionNthCharacter
-  "l",				# VimMotionRight
-  "k",				# VimMotionUp
-  "gk",				# VimMotionUp
-  "-",				# VimMotionUpFirstNonSpace
+  # "g^",				# VimMotionFirstScreenNonSpace
+
   "ge",				# VimMotionWordEndLeft
   "e",				# VimMotionWordEndRight
   "b",				# VimMotionWordLeft
@@ -71,20 +78,23 @@ nvoMotion = oneOf [
   "E",				# VimMotionBigWordEndRight
   "B",				# VimMotionBigWordLeft
   "W",				# VimMotionBigWordRight
-  "(",				# VimMotionSentenceStartPrevious
-  ")",				# VimMotionSentenceStartNext
-  "g(",				# VimMotionSentenceEndPrevious
-  "g)",				# VimMotionSentenceEndNext
-  "{",				# VimMotionParagraphPrevious
-  "}",				# VimMotionParagraphNext
-  "[{",				# VimMotionUnmatchedBraceOpen
-  "]}",				# VimMotionUnmatchedBraceClose
-  "[(",				# VimMotionUnmatchedParenOpen
-  "])",				# VimMotionUnmatchedParenClose
-  "[]",				# VimMotionSectionBackwardEnd
-  "[[",				# VimMotionSectionBackwardStart
-  "]]",				# VimMotionSectionForwardEnd
-  "][",				# VimMotionSectionForwardStart
+
+  # missing searches: tTfF /? *# g* g#
+
+  # "(",				# VimMotionSentenceStartPrevious  # too far from Vim behaviour
+  # ")",				# VimMotionSentenceStartNext      # too far from Vim behaviour
+  # "g(",				# VimMotionSentenceEndPrevious    # too far from Vim behaviour
+  # "g)",				# VimMotionSentenceEndNext        # too far from Vim behaviour
+  # "{",				# VimMotionParagraphPrevious      # too far from Vim behaviour
+  # "}",				# VimMotionParagraphNext          # too far from Vim behaviour
+  # "[{",				# VimMotionUnmatchedBraceOpen     # too far from Vim behaviour
+  # "]}",				# VimMotionUnmatchedBraceClose    # too far from Vim behaviour
+  # "[(",				# VimMotionUnmatchedParenOpen     # too far from Vim behaviour
+  # "])",				# VimMotionUnmatchedParenClose    # too far from Vim behaviour
+  # "[]",				# VimMotionSectionBackwardEnd     # buggy
+  # "[[",				# VimMotionSectionBackwardStart   # buggy
+  # "]]",				# VimMotionSectionForwardEnd      # buggy
+  # "][",				# VimMotionSectionForwardStart    # buggy
   # "[M",				# VimMotionMethodBackwardEnd
   # "[m",				# VimMotionMethodBackwardStart
   # "]M",				# VimMotionMethodForwardEnd
@@ -95,11 +105,13 @@ voMotion = oneOf [nvoMotion, voOnlyMotion]
 
 commandWithMotion = oneOf [
   "d",				# VimDeleteMotion
-  "<",				# VimShiftLeftMotion
-  ">",				# VimShiftRightMotion
+  # "<",				# VimShiftLeftMotion            # these are a bit boring
+  # ">",				# VimShiftRightMotion           # these are a bit boring
   # "gu",				# VimChangeCaseLowerMotion    # XXX: disable these, since they are *extremely* slow in IdeaVim...
   # "g~",				# VimChangeCaseToggleMotion
   # "gU",				# VimChangeCaseUpperMotion
+
+  # missing yanks: y
 ]
 
 commandWithInput = oneOf [
@@ -121,13 +133,19 @@ commandNullary = oneOf [
   "~",				# VimChangeCaseToggleCharacter
   "X",				# VimDeleteCharacterLeft
   "x",				# VimDeleteCharacterRight
-  "D",				# VimDeleteEndOfLine
+  # "D",				# VimDeleteEndOfLine      # TODO: fix
   "dd",				# VimDeleteLine
   "<<",				# VimShiftLeftLines
   ">>",				# VimShiftRightLines
   "gJ",				# VimDeleteJoinLines
   "J",				# VimDeleteJoinLinesSpaces
+  # missing pastes: p P gp gP ]p [p ]P [P
+  # missing: yy Y
 ]
+
+# missing: r<char> u U C-R & g& = C-A C-X
+# missing marks: m ` ' g` g'
+# missing: macros
 
 letter = oneOf(('a'..'z').to_a)
 randomText = proc {

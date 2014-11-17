@@ -2,6 +2,11 @@
 cd "$(dirname "$0")"
 
 for i in $(seq 1 99999); do
+    suffix=$(printf "%05d-%03d.txt" $i 1)
+    if [ ! -f "/tmp/vimfuzz/vim-$suffix" ]; then
+        break
+    fi
+
     for j in $(seq 1 99999); do
         suffix=$(printf "%05d-%03d.txt" $i $j)
         if [ ! -f "/tmp/vimfuzz/vim-$suffix" ]; then
