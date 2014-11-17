@@ -17,6 +17,10 @@ def weighted(pairs)
   }
 end
 
+def enableIf(cond, arr)
+  cond ? arr : []
+end
+
 def randomNormDist
   (((1..12).inject(0.0) { |a, k| a + rand }) - 6.0) / 6.0
 end
